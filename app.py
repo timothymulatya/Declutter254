@@ -1,20 +1,32 @@
+# app.py
 from flask import Flask, jsonify
 from extensions import db, migrate, cors, bcrypt, jwt
 from config import Config
+from utils.error_handlers import register_error_handlers
+from utils.logger import setup_logging
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
     
+    # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     cors.init_app(app)
     bcrypt.init_app(app)
     jwt.init_app(app)
     
+    # Setup logging
+    setup_logging(app)
+    
+    # Register error handlers
+    register_error_handlers(app)
+    
+    # Import models
     with app.app_context():
         from models import User, Category, Item, Request
-        
+    
+    # Import and register blueprints
     from routes.auth_routes import auth_bp
     from routes.category_routes import category_bp
     from routes.item_routes import item_bp
@@ -25,6 +37,7 @@ def create_app(config_class=Config):
     app.register_blueprint(item_bp)
     app.register_blueprint(request_bp)
     
+    # Root route
     @app.route('/')
     def index():
         return jsonify({
@@ -39,6 +52,7 @@ def create_app(config_class=Config):
             }
         })
     
+    # Health check route
     @app.route('/health')
     def health_check():
         try:
@@ -46,12 +60,16 @@ def create_app(config_class=Config):
             db_status = 'connected'
         except Exception as e:
             db_status = f'error: {str(e)}'
+            app.logger.error(f'Database health check failed: {str(e)}')
         
         return jsonify({
             'api': 'running',
             'database': db_status,
-            'environment': 'development'
+            'environment': app.config.get('ENV', 'development')
         })
+    
+    # Log application startup
+    app.logger.info('Declutter254 application started successfully')
     
     return app
 
