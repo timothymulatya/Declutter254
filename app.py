@@ -2,39 +2,54 @@ from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager
 from config import Config
 
-# Initialize extensions (but don't connect them to app yet)
+# Initialize extensions
 db = SQLAlchemy()
 migrate = Migrate()
 cors = CORS()
+bcrypt = Bcrypt()
+jwt = JWTManager()
 
 def create_app(config_class=Config):
-    # Create Flask app instance
     app = Flask(__name__)
-    
-    # Load configuration from config.py
     app.config.from_object(config_class)
     
-    # Initialize extensions with this app instance
+    # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     cors.init_app(app)
+    bcrypt.init_app(app)
+    jwt.init_app(app)
     
-    # Simple test route to verify API is working
+    # Import models
+    from models import User, Category, Item, Request
+    
+    # Register blueprints
+    from routes.auth_routes import auth_bp
+    from routes.category_routes import category_bp
+    
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(category_bp)
+    
+    # Test route
     @app.route('/')
     def index():
         return jsonify({
             'message': 'Declutter254 API is running!',
             'status': 'success',
-            'version': '1.0'
+            'version': '1.0',
+            'endpoints': {
+                'auth': '/api/auth/register, /api/auth/login, /api/auth/profile',
+                'categories': '/api/categories/'
+            }
         })
     
-    # Another test route to check database connection later
     @app.route('/health')
     def health_check():
         try:
-            # Try to query the database
             db.session.execute('SELECT 1')
             db_status = 'connected'
         except Exception as e:
@@ -48,7 +63,6 @@ def create_app(config_class=Config):
     
     return app
 
-# This runs when you execute the file directly
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, port=5555)  # debug=True auto-reloads on code changes
+    app.run(debug=True, port=5555)
