@@ -1,3 +1,4 @@
+# routes/request_routes.py
 from flask import Blueprint, request, jsonify
 from extensions import db
 from models import Request, Item, User
@@ -58,6 +59,82 @@ def create_request(item_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+@request_bp.route('/<int:request_id>', methods=['GET'])
+@jwt_required()
+def get_request(request_id):
+    """
+    Get a single request by ID
+    Only accessible by the seeker or the giver of the item
+    """
+    try:
+        user_id = get_jwt_identity()
+        request_item = Request.query.get(request_id)
+        
+        if not request_item:
+            return jsonify({'error': 'Request not found'}), 404
+        
+        # Check if user is either the seeker or the giver
+        is_seeker = request_item.seeker_id == int(user_id)
+        is_giver = request_item.item.giver_id == int(user_id)
+        
+        if not (is_seeker or is_giver):
+            return jsonify({'error': 'You can only view your own requests'}), 403
+        
+        return jsonify(request_item.to_dict()), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@request_bp.route('/', methods=['GET'])
+@jwt_required()
+def get_requests():
+    """
+    Get all requests with optional filtering
+    Query parameters:
+    - status: filter by status (pending, approved, rejected)
+    - item_id: filter by specific item
+    - role: 'giver' or 'seeker' to filter by user's role
+    """
+    try:
+        user_id = get_jwt_identity()
+        status = request.args.get('status')
+        item_id = request.args.get('item_id')
+        role = request.args.get('role')
+        
+        query = Request.query
+        
+        # Filter by status
+        if status:
+            query = query.filter_by(status=status)
+        
+        # Filter by specific item
+        if item_id:
+            query = query.filter_by(item_id=item_id)
+        
+        # Filter by user's role
+        if role == 'giver':
+            # Get items belonging to current user
+            user_items = Item.query.filter_by(giver_id=user_id).all()
+            item_ids = [item.id for item in user_items]
+            query = query.filter(Request.item_id.in_(item_ids))
+        elif role == 'seeker':
+            query = query.filter_by(seeker_id=user_id)
+        else:
+            # Default: show both incoming and outgoing
+            user_items = Item.query.filter_by(giver_id=user_id).all()
+            item_ids = [item.id for item in user_items]
+            query = query.filter(
+                (Request.seeker_id == user_id) | 
+                (Request.item_id.in_(item_ids))
+            )
+        
+        # Order by newest first
+        requests_list = query.order_by(Request.created_at.desc()).all()
+        
+        return jsonify([req.to_dict() for req in requests_list]), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @request_bp.route('/incoming', methods=['GET'])
 @jwt_required()
@@ -68,15 +145,14 @@ def get_incoming_requests():
         user_items = Item.query.filter_by(giver_id=user_id).all()
         item_ids = [item.id for item in user_items]
 
-        requests = Request.query.filter(
+        requests_list = Request.query.filter(
             Request.item_id.in_(item_ids)
         ).order_by(Request.created_at.desc()).all()
 
-        return jsonify([req.to_dict() for req in requests]), 200
+        return jsonify([req.to_dict() for req in requests_list]), 200
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @request_bp.route('/outgoing', methods=['GET'])
 @jwt_required()
@@ -84,12 +160,11 @@ def get_outgoing_requests():
     """Get all requests made by the current user"""
     try:
         user_id = get_jwt_identity()
-        requests = Request.query.filter_by(seeker_id=user_id).order_by(Request.created_at.desc()).all()
-        return jsonify([req.to_dict() for req in requests]), 200
+        requests_list = Request.query.filter_by(seeker_id=user_id).order_by(Request.created_at.desc()).all()
+        return jsonify([req.to_dict() for req in requests_list]), 200
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 @request_bp.route('/<int:request_id>/approve', methods=['PATCH'])
 @jwt_required()
@@ -97,24 +172,25 @@ def approve_request(request_id):
     """Approve a request - reveals phone number"""
     try:
         user_id = get_jwt_identity()
-        request = Request.query.get(request_id)
+        request_item = Request.query.get(request_id)
 
-        if not request:
+        if not request_item:
             return jsonify({'error': 'Request not found'}), 404
 
-        if request.item.giver_id != int(user_id):
+        if request_item.item.giver_id != int(user_id):
             return jsonify({'error': 'You can only approve requests for your own items'}), 403
 
-        if request.status != 'pending':
-            return jsonify({'error': f'This request is already {request.status}'}), 400
+        if request_item.status != 'pending':
+            return jsonify({'error': f'This request is already {request_item.status}'}), 400
 
-        if not request.item.is_available:
+        if not request_item.item.is_available:
             return jsonify({'error': 'This item is no longer available'}), 400
 
-        request.status = 'approved'
+        request_item.status = 'approved'
 
+        # Reject all other pending requests for this item
         other_requests = Request.query.filter(
-            Request.item_id == request.item_id,
+            Request.item_id == request_item.item_id,
             Request.id != request_id,
             Request.status == 'pending'
         ).all()
@@ -126,13 +202,12 @@ def approve_request(request_id):
 
         return jsonify({
             'message': 'Request approved successfully. Phone number revealed.',
-            'request': request.to_dict()
+            'request': request_item.to_dict()
         }), 200
 
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
-
 
 @request_bp.route('/<int:request_id>/reject', methods=['PATCH'])
 @jwt_required()
@@ -140,23 +215,23 @@ def reject_request(request_id):
     """Reject a request"""
     try:
         user_id = get_jwt_identity()
-        request = Request.query.get(request_id)
+        request_item = Request.query.get(request_id)
 
-        if not request:
+        if not request_item:
             return jsonify({'error': 'Request not found'}), 404
 
-        if request.item.giver_id != int(user_id):
+        if request_item.item.giver_id != int(user_id):
             return jsonify({'error': 'You can only reject requests for your own items'}), 403
 
-        if request.status != 'pending':
-            return jsonify({'error': f'This request is already {request.status}'}), 400
+        if request_item.status != 'pending':
+            return jsonify({'error': f'This request is already {request_item.status}'}), 400
 
-        request.status = 'rejected'
+        request_item.status = 'rejected'
         db.session.commit()
 
         return jsonify({
             'message': 'Request rejected',
-            'request': request.to_dict()
+            'request': request_item.to_dict()
         }), 200
 
     except Exception as e:
