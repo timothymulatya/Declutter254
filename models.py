@@ -19,8 +19,6 @@ class User(db.Model):
                                        back_populates='seeker',
                                        cascade='all, delete-orphan')
     
-
-    
     def __repr__(self):
         return f'<User: {self.name} ({self.phone_number})>'
     
@@ -32,9 +30,7 @@ class User(db.Model):
             'location': self.location,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'items_count': len(self.items) if self.items else 0
-           
         }
-
 
 class Category(db.Model):
     __tablename__ = 'categories'
@@ -46,8 +42,6 @@ class Category(db.Model):
     # Relationships
     items = db.relationship('Item', back_populates='category')
     
-    
-    
     def __repr__(self):
         return f'<Category: {self.name}>'
     
@@ -58,7 +52,6 @@ class Category(db.Model):
             'description': self.description,
             'items_count': len(self.items) if self.items else 0
         }
-
 
 class Item(db.Model):
     __tablename__ = 'items'
@@ -87,11 +80,15 @@ class Item(db.Model):
                               back_populates='item',
                               cascade='all, delete-orphan')
     
-    
     def __repr__(self):
         return f'<Item: {self.title}>'
     
     def to_dict(self):
+        # Count pending requests only
+        pending_count = 0
+        if self.requests:
+            pending_count = len([r for r in self.requests if r.status == 'pending'])
+        
         return {
             'id': self.id,
             'title': self.title,
@@ -108,16 +105,15 @@ class Item(db.Model):
             'giver_name': self.giver.name if self.giver else None,
             'category_id': self.category_id,
             'category_name': self.category.name if self.category else None,
-            'requests_count': len([r for r in self.requests if r.status == 'pending']) if self.requests else 0
+            'pending_requests': pending_count
         }
-
 
 class Request(db.Model):
     __tablename__ = 'requests'
     
     id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.Text, nullable=False)  # USER-SUBMITTABLE ATTRIBUTE
-    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
+    message = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), default='pending')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Foreign Keys
@@ -127,8 +123,6 @@ class Request(db.Model):
     # Relationships
     seeker = db.relationship('User', foreign_keys=[seeker_id], back_populates='outgoing_requests')
     item = db.relationship('Item', foreign_keys=[item_id], back_populates='requests')
-    
-   
     
     @property
     def giver(self):
@@ -157,4 +151,3 @@ class Request(db.Model):
             'giver_name': self.giver.name if self.giver else None,
             'giver_phone': self.giver_phone
         }
-

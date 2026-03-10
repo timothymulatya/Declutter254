@@ -1,12 +1,2 @@
 Single-database configuration for Flask.
 
-Tasks for Team Members
-
-
-2. Tasks for Team Member 2-Timothy Mulatya:
-API  Routes to Implement:
-•GET /categories - Get all categories
-•POST  /categories - Create category
-•GET /users - Get all users
-•GET /users/<id> - Get single user
-•POST  /users - Register user (phone validation)
