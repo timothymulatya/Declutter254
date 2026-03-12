@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { fetchItems } from "../api/items"
 import FilterBar from "../components/FilterBar"
 import SearchBar from "../components/SearchBar"
+import ItemCard from "../components/ItemCard"
 
 function HomePage(){
 
@@ -63,29 +64,17 @@ function HomePage(){
 
       <FilterBar onFilter={handleFilter} />
 
-      <div>
+      <div
+        style={{
+          display:"flex",
+          flexWrap:"wrap",
+          gap:"15px",
+          marginTop:"20px"
+        }}
+      >
 
         {filteredItems.map(item => (
-
-          <div
-            key={item.id}
-            style={{
-              border:"1px solid #ccc",
-              padding:"10px",
-              margin:"10px"
-            }}
-          >
-
-            <h3>{item.title}</h3>
-
-            <p>{item.description}</p>
-
-            <p><strong>Category:</strong> {item.category}</p>
-
-            <p><strong>Location:</strong> {item.location}</p>
-
-          </div>
-
+          <ItemCard key={item.id} item={item}/>
         ))}
 
       </div>
