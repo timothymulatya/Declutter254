@@ -1,45 +1,99 @@
-import { useEffect, useState } from "react";
-import { fetchItems } from "../api/api";
-import { Link } from "react-router-dom";
-import FilterBar from "../components/FilterBar";
+import { useEffect, useState } from "react"
+import { fetchItems } from "../api/items"
+import FilterBar from "../components/FilterBar"
+import SearchBar from "../components/SearchBar"
 
-function HomePage() {
+function HomePage(){
 
-  const [items, setItems] = useState([]);
-  const [filteredItems, setFilteredItems] = useState([]);
+  const [items, setItems] = useState([])
+  const [filteredItems, setFilteredItems] = useState([])
 
   useEffect(() => {
-    fetchItems().then(data => {
-      setItems(data);
-      setFilteredItems(data);
-    });
-  }, []);
 
-  return (
+    fetchItems().then(data => {
+      setItems(data)
+      setFilteredItems(data)
+    })
+
+  }, [])
+
+
+  function handleFilter(filters){
+
+    let result = items
+
+    if(filters.category){
+      result = result.filter(item => item.category === filters.category)
+    }
+
+    if(filters.location){
+      result = result.filter(item =>
+        item.location.toLowerCase().includes(filters.location.toLowerCase())
+      )
+    }
+
+    setFilteredItems(result)
+
+  }
+
+
+  function handleSearch(query){
+
+    if(!query){
+      setFilteredItems(items)
+      return
+    }
+
+    const result = items.filter(item =>
+      item.title.toLowerCase().includes(query.toLowerCase())
+    )
+
+    setFilteredItems(result)
+
+  }
+
+
+  return(
+
     <div>
 
       <h1>Available Items</h1>
 
-      <FilterBar items={items} setFilteredItems={setFilteredItems} />
+      <SearchBar onSearch={handleSearch} />
 
-      {filteredItems.map(item => (
+      <FilterBar onFilter={handleFilter} />
 
-        <div key={item.id} style={{border:"1px solid gray", margin:"10px", padding:"10px"}}>
+      <div>
 
-          <h3>{item.title}</h3>
+        {filteredItems.map(item => (
 
-          <p>{item.description}</p>
+          <div
+            key={item.id}
+            style={{
+              border:"1px solid #ccc",
+              padding:"10px",
+              margin:"10px"
+            }}
+          >
 
-          <Link to={`/item/${item.id}`}>
-            View Details
-          </Link>
+            <h3>{item.title}</h3>
 
-        </div>
+            <p>{item.description}</p>
 
-      ))}
+            <p><strong>Category:</strong> {item.category}</p>
+
+            <p><strong>Location:</strong> {item.location}</p>
+
+          </div>
+
+        ))}
+
+      </div>
 
     </div>
-  );
+
+  )
+
 }
 
-export default HomePage; 
+export default HomePage 
