@@ -1,60 +1,39 @@
 import { useState } from "react";
 
-function FilterBar({items, setFilteredItems}) {
-
-  const [search, setSearch] = useState("");
+function FilterBar({ onFilter }) {
   const [category, setCategory] = useState("");
 
-  function handleSearch(value) {
-
-    setSearch(value);
-
-    const filtered = items.filter(item =>
-      item.title.toLowerCase().includes(value.toLowerCase())
-    );
-
-    setFilteredItems(filtered);
-  }
-
   function handleCategory(value) {
-
     setCategory(value);
-
-    const filtered = items.filter(item =>
-      item.category === value || value === ""
-    );
-
-    setFilteredItems(filtered);
+    onFilter({ category: value });
   }
 
   return (
-
-    <div style={{margin:"20px 0"}}>
-
-      <input
-        type="text"
-        placeholder="Search items..."
-        value={search}
-        onChange={(e)=>handleSearch(e.target.value)}
-      />
-
+    <div style={{ margin: "0 0 20px 0", width: "100%" }}>
       <select
         value={category}
-        onChange={(e)=>handleCategory(e.target.value)}
+        onChange={(e) => handleCategory(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "12px",
+          borderRadius: "12px",
+          border: "2px solid #eee",
+          background: "white",
+          fontSize: "1rem",
+          fontWeight: "500",
+          color: "var(--neutral-black)",
+          cursor: "pointer"
+        }}
       >
-
         <option value="">All Categories</option>
-        <option value="Kitchen">Kitchen</option>
-        <option value="Furniture">Furniture</option>
-        <option value="Clothes">Clothes</option>
-        <option value="Books">Books</option>
         <option value="Electronics">Electronics</option>
-
+        <option value="Furniture">Furniture</option>
+        <option value="Clothing">Clothing</option>
+        <option value="Books">Books</option>
+        <option value="Home Appliances">Home Appliances</option>
       </select>
-
     </div>
-
   );
 }
 
-export default FilterBar; 
+export default FilterBar;

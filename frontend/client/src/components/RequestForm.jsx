@@ -10,7 +10,6 @@ const schema = Yup.object({
 function RequestForm({ itemId }) {
 
   function handleSubmit(values, { resetForm }) {
-
     createRequest(itemId, values.message)
       .then(() => {
         alert("Request sent successfully!");
@@ -19,14 +18,10 @@ function RequestForm({ itemId }) {
       .catch(() => {
         alert("Failed to send request");
       });
-
   }
 
   return (
-    <div style={{ marginTop: "20px", borderTop: "1px solid gray", paddingTop: "20px" }}>
-
-      <h3>Request This Item</h3>
-
+    <div style={{ marginTop: "24px", color: "var(--neutral-black)" }}>
       <Formik
         initialValues={{
           message: "",
@@ -35,39 +30,35 @@ function RequestForm({ itemId }) {
         validationSchema={schema}
         onSubmit={handleSubmit}
       >
-
         <Form>
-
-          <div>
-            <label>Message to Giver</label><br/>
+          <div style={{ marginBottom: "20px" }}>
+            <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", fontSize: "0.9rem" }}>
+              Message to Giver
+            </label>
             <Field
               as="textarea"
               name="message"
-              placeholder="Write a short message..."
+              placeholder="Tell the giver why you need this or when you can pick it up..."
+              style={{ minHeight: "100px", resize: "vertical" }}
             />
-            <br/>
-            <ErrorMessage name="message" component="div" style={{color:"red"}}/>
+            <ErrorMessage name="message" component="div" style={{ color: "var(--accent-maroon)", fontSize: "0.8rem", marginTop: "-10px" }} />
           </div>
 
-          <div style={{marginTop:"10px"}}>
-            <label>
-              <Field type="checkbox" name="confirm"/>
-              {" "}I confirm I can follow the pickup terms
+          <div style={{ marginBottom: "24px" }}>
+            <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", fontSize: "0.9rem", cursor: "pointer" }}>
+              <Field type="checkbox" name="confirm" style={{ width: "auto", margin: "4px 0 0 0" }} />
+              <span>I confirm that I can follow the pickup terms and will handle the item with care.</span>
             </label>
-            <br/>
-            <ErrorMessage name="confirm" component="div" style={{color:"red"}}/>
+            <ErrorMessage name="confirm" component="div" style={{ color: "var(--accent-maroon)", fontSize: "0.8rem", marginTop: "4px" }} />
           </div>
 
-          <button type="submit" style={{marginTop:"10px"}}>
+          <button type="submit" className="btn-primary" style={{ width: "100%", padding: "14px" }}>
             Send Request
           </button>
-
         </Form>
-
       </Formik>
-
     </div>
   );
 }
 
-export default RequestForm; 
+export default RequestForm;

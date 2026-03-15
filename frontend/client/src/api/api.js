@@ -1,7 +1,8 @@
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "http://localhost:5555/api";
 
-export function fetchItems() {
-  return fetch(`${BASE_URL}/items`)
+export function fetchItems(params = {}) {
+  const query = new URLSearchParams(params).toString();
+  return fetch(`${BASE_URL}/items/?${query}`)
     .then(res => res.json());
 }
 
@@ -14,7 +15,7 @@ export function createItem(data) {
   return fetch(`${BASE_URL}/items`, {
     method: "POST",
     headers: {
-      "Content-Type":"application/json"
+      "Content-Type": "application/json"
     },
     body: JSON.stringify(data)
   }).then(res => res.json());
@@ -24,7 +25,7 @@ export function updateItem(id, data) {
   return fetch(`${BASE_URL}/items/${id}`, {
     method: "PATCH",
     headers: {
-      "Content-Type":"application/json"
+      "Content-Type": "application/json"
     },
     body: JSON.stringify(data)
   }).then(res => res.json());
@@ -39,22 +40,22 @@ export function deleteItem(id) {
 export function markAsGiven(id) {
   return fetch(`${BASE_URL}/items/${id}`, {
     method: "PATCH",
-    headers:{
-      "Content-Type":"application/json"
+    headers: {
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify({status:"given"})
+    body: JSON.stringify({ status: "given" })
   });
 }
 
 export function createRequest(itemId, message) {
   return fetch(`${BASE_URL}/requests`, {
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      item_id:itemId,
-      message:message
+      item_id: itemId,
+      message: message
     })
   }).then(res => res.json());
 } 

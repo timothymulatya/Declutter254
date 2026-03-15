@@ -1,35 +1,36 @@
 import { useEffect, useState } from "react"
-import { fetchItems } from "../api/items"
+import { fetchItems } from "../api/api"
 import FilterBar from "../components/FilterBar"
 import SearchBar from "../components/SearchBar"
 import ItemCard from "../components/ItemCard"
 
-function HomePage(){
+function HomePage() {
 
-  const [items,setItems] = useState([])
-  const [filteredItems,setFilteredItems] = useState([])
-  const [loading,setLoading] = useState(true)
+  const [items, setItems] = useState([])
+  const [filteredItems, setFilteredItems] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  useEffect(()=>{
+  useEffect(() => {
 
-    fetchItems().then(data=>{
-      setItems(data)
-      setFilteredItems(data)
+    fetchItems().then(data => {
+      const itemsList = data.items || data;
+      setItems(itemsList)
+      setFilteredItems(itemsList)
       setLoading(false)
     })
 
-  },[])
+  }, [])
 
 
-  function handleFilter(filters){
+  function handleFilter(filters) {
 
     let result = items
 
-    if(filters.category){
+    if (filters.category) {
       result = result.filter(item => item.category === filters.category)
     }
 
-    if(filters.location){
+    if (filters.location) {
       result = result.filter(item =>
         item.location.toLowerCase().includes(filters.location.toLowerCase())
       )
@@ -40,9 +41,9 @@ function HomePage(){
   }
 
 
-  function handleSearch(query){
+  function handleSearch(query) {
 
-    if(!query){
+    if (!query) {
       setFilteredItems(items)
       return
     }
@@ -56,11 +57,11 @@ function HomePage(){
   }
 
 
-  if(loading){
+  if (loading) {
 
-    return(
+    return (
 
-      <div style={{padding:"30px", textAlign:"center"}}>
+      <div style={{ padding: "30px", textAlign: "center" }}>
 
         <h2>Loading items...</h2>
 
@@ -71,28 +72,34 @@ function HomePage(){
   }
 
 
-  return(
+  return (
 
-    <div style={{padding:"30px"}}>
+    <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
 
-      <h1 style={{marginBottom:"20px"}}>Available Items</h1>
+      <h1 style={{ fontSize: "1.8rem", marginBottom: "8px", color: "var(--accent-maroon)" }}>Available Items</h1>
+      <p style={{ color: "#666", marginBottom: "24px" }}>Find what you need, give what you don't.</p>
 
-      <SearchBar onSearch={handleSearch} />
-
-      <FilterBar onFilter={handleFilter} />
+      <div style={{ marginBottom: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
+        <SearchBar onSearch={handleSearch} />
+        <FilterBar onFilter={handleFilter} />
+      </div>
 
       {filteredItems.length === 0 ? (
 
         <div
           style={{
-            marginTop:"40px",
-            textAlign:"center",
-            color:"#666"
+            marginTop: "60px",
+            textAlign: "center",
+            color: "#666",
+            padding: "40px",
+            background: "white",
+            borderRadius: "12px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
           }}
         >
 
-          <h2>No items available yet</h2>
-          <p>Be the first to post something!</p>
+          <h2 style={{ color: "var(--accent-maroon)" }}>No items found</h2>
+          <p>Try adjusting your search or filters.</p>
 
         </div>
 
@@ -100,16 +107,16 @@ function HomePage(){
 
         <div
           style={{
-            display:"grid",
-            gridTemplateColumns:"repeat(auto-fill, minmax(230px,1fr))",
-            gap:"20px",
-            marginTop:"30px"
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+            gap: "16px",
+            marginTop: "30px"
           }}
         >
 
           {filteredItems.map(item => (
 
-            <ItemCard key={item.id} item={item}/>
+            <ItemCard key={item.id} item={item} />
 
           ))}
 

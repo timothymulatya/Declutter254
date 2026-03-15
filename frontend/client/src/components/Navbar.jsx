@@ -15,51 +15,44 @@ const Navbar = () => {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '1rem 2rem',
-    backgroundColor: '#2c3e50',
-    color: 'white',
-    borderBottom: '1px solid #dee2e6'
+    padding: '1rem',
+    backgroundColor: 'var(--neutral-white)',
+    color: 'var(--neutral-black)',
+    borderBottom: '2px solid var(--primary-skyblue)',
+    position: 'sticky',
+    top: 0,
+    zIndex: 1000,
+    boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
   };
 
   const linksStyle = {
     display: 'flex',
-    gap: '20px',
+    gap: '12px',
     alignItems: 'center'
   };
 
   const linkStyle = {
-    color: 'white',
+    color: 'var(--neutral-black)',
     textDecoration: 'none',
-    fontWeight: '500'
+    fontWeight: '600',
+    fontSize: '0.9rem'
   };
 
   return (
     <nav style={navStyle}>
-      <Link to="/" style={{ ...linkStyle, fontSize: '1.5rem', fontWeight: 'bold' }}>
+      <Link to="/" style={{ ...linkStyle, fontSize: '1.2rem', fontWeight: '800', color: 'var(--accent-maroon)' }}>
         Declutter254
       </Link>
 
       <div style={linksStyle}>
-        <Link style={linkStyle} to="/">Home</Link>
-        {user && (
-          <>
-            <Link style={linkStyle} to="/post-item">Post Item</Link>
-            <Link style={linkStyle} to="/requests">Requests</Link>
-            <Link style={linkStyle} to="/profile">Profile</Link>
-          </>
-        )}
         {user ? (
           <>
-            <span style={{ marginRight: '10px' }}>Hello, {user.name}</span>
             <button
               onClick={handleLogout}
+              className="btn-accent"
               style={{
-                padding: '5px 15px',
-                cursor: 'pointer',
-                backgroundColor: '#e74c3c',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px'
+                padding: '6px 12px',
+                fontSize: '0.8rem'
               }}
             >
               Logout
@@ -68,7 +61,7 @@ const Navbar = () => {
         ) : (
           <>
             <Link style={linkStyle} to="/login">Login</Link>
-            <Link style={linkStyle} to="/signup">Sign Up</Link>
+            <Link style={{ ...linkStyle, color: 'var(--primary-skyblue)' }} to="/signup">Join</Link>
           </>
         )}
       </div>

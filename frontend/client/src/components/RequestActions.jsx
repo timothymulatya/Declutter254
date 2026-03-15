@@ -1,39 +1,39 @@
-import { approveRequest, rejectRequest } from "../api/items"
+import { approveRequest, rejectRequest, markAsGiven } from "../api/api"
 
-function RequestActions({ request, refreshRequests }){
+function RequestActions({ request, refreshRequests }) {
 
-  function handleApprove(){
+  function handleApprove() {
 
     approveRequest(request.id)
-    .then(() => refreshRequests())
+      .then(() => refreshRequests())
 
   }
 
-  function handleReject(){
+  function handleReject() {
 
     rejectRequest(request.id)
-    .then(() => refreshRequests())
+      .then(() => refreshRequests())
 
   }
 
-  if(request.status !== "pending"){
+  if (request.status !== "pending") {
     return null
   }
 
-  return(
+  return (
 
-    <div style={{marginTop:"10px"}}>
+    <div style={{ marginTop: "10px" }}>
 
       <button
         onClick={handleApprove}
-        style={{marginRight:"10px", background:"green", color:"white"}}
+        style={{ marginRight: "10px", background: "green", color: "white" }}
       >
         Approve
       </button>
 
       <button
         onClick={handleReject}
-        style={{background:"red", color:"white"}}
+        style={{ background: "red", color: "white" }}
       >
         Reject
       </button>
