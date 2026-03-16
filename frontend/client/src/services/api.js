@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5555/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5555/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -46,7 +46,7 @@ export const markItemAsGiven = (id) => api.patch(`/items/${id}/mark-given`);
 export const getCategories = () => api.get('/categories/');
 
 // Requests API
-export const createRequest = (itemId, message) => 
+export const createRequest = (itemId, message) =>
   api.post(`/requests/item/${itemId}`, { message });
 export const getIncomingRequests = () => api.get('/requests/incoming');
 export const getOutgoingRequests = () => api.get('/requests/outgoing');
