@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (phone_number, password) => {
         try {
-            const response = await axios.post('http://localhost:5555/api/auth/login', {
+            const response = await axios.post('/api/auth/login', {
                 phone_number,
                 password
             });
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (userData) => {
         try {
-            const response = await axios.post('http://localhost:5555/api/auth/register', userData);
+            const response = await axios.post('/api/auth/register', userData);
             const { token, user } = response.data;
             localStorage.setItem('token', token);
             setToken(token);
@@ -52,16 +52,16 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const logout = () => {
+    const logout = useCallback(() => {
         localStorage.removeItem('token');
         setToken(null);
         setUser(null);
         delete axios.defaults.headers.common['Authorization'];
-    };
+    }, []);
 
-    const fetchProfile = async () => {
+    const fetchProfile = useCallback(async () => {
         try {
-            const response = await axios.get('http://localhost:5555/api/auth/profile');
+            const response = await axios.get('/api/auth/profile');
             setUser(response.data);
         } catch (error) {
             console.error('Failed to fetch profile:', error);
@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [logout]);
 
     useEffect(() => {
         if (token) {
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }) => {
         } else {
             setLoading(false);
         }
-    }, [token]);
+    }, [token, fetchProfile]);
 
     const value = {
         user,

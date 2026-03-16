@@ -14,8 +14,8 @@ const Dashboard = () => {
         const fetchDashboardData = async () => {
             try {
                 const [statsRes, activityRes] = await Promise.all([
-                    axios.get('http://localhost:5555/api/dashboard/stats'),
-                    axios.get('http://localhost:5555/api/dashboard/activity')
+                    axios.get('/api/dashboard/stats'),
+                    axios.get('/api/dashboard/activity')
                 ]);
                 setStats(statsRes.data);
                 setActivity(activityRes.data);
