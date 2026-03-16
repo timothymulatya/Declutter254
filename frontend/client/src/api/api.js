@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:5555/api";
+const BASE_URL = "/api";
 
 export function fetchItems(params = {}) {
   const query = new URLSearchParams(params).toString();
