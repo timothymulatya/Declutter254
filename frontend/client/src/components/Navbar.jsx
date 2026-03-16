@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { PlusCircle, LayoutDashboard, LogOut } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -15,7 +16,7 @@ const Navbar = () => {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '1rem',
+    padding: '1rem 2rem',
     backgroundColor: 'var(--neutral-white)',
     color: 'var(--neutral-black)',
     borderBottom: '2px solid var(--primary-skyblue)',
@@ -27,7 +28,7 @@ const Navbar = () => {
 
   const linksStyle = {
     display: 'flex',
-    gap: '12px',
+    gap: '24px',
     alignItems: 'center'
   };
 
@@ -35,7 +36,11 @@ const Navbar = () => {
     color: 'var(--neutral-black)',
     textDecoration: 'none',
     fontWeight: '600',
-    fontSize: '0.9rem'
+    fontSize: '0.9rem',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    transition: 'color 0.2s ease'
   };
 
   return (
@@ -47,14 +52,27 @@ const Navbar = () => {
       <div style={linksStyle}>
         {user ? (
           <>
+            <Link style={linkStyle} to="/post-item">
+              <PlusCircle size={20} color="var(--primary-skyblue)" />
+              <span>Give Item</span>
+            </Link>
+            <Link style={linkStyle} to="/dashboard">
+              <LayoutDashboard size={20} />
+              <span>Dashboard</span>
+            </Link>
             <button
               onClick={handleLogout}
               className="btn-accent"
               style={{
-                padding: '6px 12px',
-                fontSize: '0.8rem'
+                padding: '8px 16px',
+                fontSize: '0.85rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                borderRadius: '8px'
               }}
             >
+              <LogOut size={18} />
               Logout
             </button>
           </>

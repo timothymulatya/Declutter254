@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import RequestsPage from "./pages/RequestsPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Dashboard from "./pages/Dashboard";
 import PostItemForm from "./components/PostItemForm";
 
 function App() {
@@ -38,6 +39,12 @@ function App() {
           <Route path="/requests" element={
             <PrivateRoute>
               <RequestsPage />
+            </PrivateRoute>
+          } />
+
+          <Route path="/dashboard" element={
+            <PrivateRoute>
+              <Dashboard />
             </PrivateRoute>
           } />
         </Routes>
