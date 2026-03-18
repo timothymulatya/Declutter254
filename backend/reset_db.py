@@ -1,6 +1,6 @@
-from app import create_app
-from extensions import db
-from models import User, Category, Item, Request
+from backend.app import create_app
+from backend.extensions import db
+from backend.models import User, Category, Item, Request
 from flask_bcrypt import generate_password_hash
 
 def reset_database():

@@ -1,7 +1,7 @@
 # routes/dashboard_routes.py
 from flask import Blueprint, jsonify
-from extensions import db
-from models import User, Item, Request, Category
+from backend.extensions import db
+from backend.models import User, Item, Request, Category
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import func, extract
 from datetime import datetime, timedelta

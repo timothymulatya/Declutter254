@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify
-from extensions import db
-from models import Request, Item, User
+from backend.extensions import db
+from backend.models import Request, Item, User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
-from utils.validation import validate_request
+from backend.utils.validation import validate_request
 
 request_bp = Blueprint('requests', __name__, url_prefix='/api/requests')
 

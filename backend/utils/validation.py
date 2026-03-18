@@ -1,5 +1,5 @@
 # utils/validation.py
-from models import Category, Item
+from backend.models import Category, Item
 
 def validate_item(data):
     """Validate item data before saving"""
@@ -46,5 +46,5 @@ def validate_request(data):
 
 def validate_phone(phone):
     """Validate Kenyan phone number"""
-    from utils.validators import validate_kenyan_phone
+    from backend.utils.validators import validate_kenyan_phone
     return validate_kenyan_phone(phone) is not None

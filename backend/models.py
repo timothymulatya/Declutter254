@@ -1,5 +1,5 @@
 # models.py - CLEAN MVP VERSION
-from extensions import db
+from backend.extensions import db
 from datetime import datetime
 
 class User(db.Model):

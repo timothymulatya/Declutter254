@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
-from extensions import db, migrate, cors, bcrypt, jwt
-from config import Config
+from backend.extensions import db, migrate, cors, bcrypt, jwt
+from backend.config import Config
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -13,13 +13,13 @@ def create_app(config_class=Config):
     jwt.init_app(app)
     
     with app.app_context():
-        from models import User, Category, Item, Request
+        from backend.models import User, Category, Item, Request
         
-    from routes.auth_routes import auth_bp
-    from routes.category_routes import category_bp
-    from routes.item_routes import item_bp
-    from routes.request_routes import request_bp
-    from routes.dashboard_routes import dashboard_bp
+    from backend.routes.auth_routes import auth_bp
+    from backend.routes.category_routes import category_bp
+    from backend.routes.item_routes import item_bp
+    from backend.routes.request_routes import request_bp
+    from backend.routes.dashboard_routes import dashboard_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(category_bp)

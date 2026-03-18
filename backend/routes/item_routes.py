@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify
-from extensions import db
-from models import Item, Category, User, Request
+from backend.extensions import db
+from backend.models import Item, Category, User, Request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import or_, func
-from utils.validation import validate_item
+from backend.utils.validation import validate_item
 
 item_bp = Blueprint('items', __name__, url_prefix='/api/items')
 

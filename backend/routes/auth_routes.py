@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
-from extensions import db, bcrypt
-from models import User
-from utils.validators import validate_kenyan_phone, validate_required_fields
+from backend.extensions import db, migrate, cors, bcrypt, jwt
+from backend.config import Config
+from backend.utils.validators import validate_kenyan_phone, validate_required_fields
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
 

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from extensions import db
-from models import Category
+from backend.extensions import db
+from backend.models import Category
 from flask_jwt_extended import jwt_required, get_jwt_identity
 category_bp = Blueprint('categories', __name__, url_prefix='/api/categories')
 
